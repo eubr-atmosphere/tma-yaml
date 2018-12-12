@@ -15,8 +15,8 @@ disk.0.applications contains (name='ansible.modules.grycap.kubernetes')
 
 system wn (
 cpu.arch='x86_64' and
-cpu.count>=2 and
-memory.size>=2g and
+cpu.count>=4 and
+memory.size>=4g and
 net_interface.0.connection = 'private' and
 net_interface.0.dns_name = 'wn-#N#' and
 disk.0.os.name='linux'
@@ -165,7 +165,7 @@ configure tmadeployment (
       lineinfile:
         path: /tmp/tma-yaml/integrated/tma_deployment.yaml
         regexp: '192.168.122.37'
-        line: "              - {{ hostvars[groups['ceph'][0]]['IM_NODE_PUBLIC_IP'] }}:6789"
+        line: "              - {{ hostvars[groups['ceph'][0]]['IM_NODE_PRIVATE_IP'] }}:6789"
         state: present
 @end
 )
