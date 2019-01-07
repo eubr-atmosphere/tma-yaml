@@ -11,6 +11,16 @@ The recipes provided in this repo contain the neccessary steps to install the TM
 Choose your prefered option and, with the IM client, execute the following command:
 
 $ ./im_client.py create tmaframework.radl -a auth.dat
+
+You can get the contextualization logs of the infrastructure with the next command:
+
 $ ./im_client.py getcontmsg <inf_id>
+
+You can connect with the front-end of the infrastructure with the next command:
+
+$ ./im_client.py ssh <inf_id>
+
+Finally, when you finished to use your deployment, you can destroy it with the following command:
+
 $ ./im_client.py destroy <inf_id>
 
