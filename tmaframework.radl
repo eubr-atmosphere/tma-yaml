@@ -93,10 +93,6 @@ configure cephnode (
       register: KERNEL_RELEASE
       changed_when: false
 
-    - name: Check kernel version and disable ceph feature if needed
-      command: rbd feature disable tma_k_db_mysql exclusive-lock
-      when: KERNEL_RELEASE.stdout | version_compare('4.12.0', '<=')
-
     - name: Install git package
       package: name=git
 
@@ -129,6 +125,10 @@ configure cephnode (
 
     - name: Execute ceph installation script
       command: sh ceph_installation.sh chdir=/tmp/tma/development/ceph/
+
+    - name: Check kernel version and disable ceph feature if needed
+      command: rbd feature disable tma_k_db_mysql exclusive-lock
+      when: KERNEL_RELEASE.stdout | version_compare('4.12.0', '<=')
 
     - lineinfile:
         path: /tmp/tma/development/ceph/ceph_configuration.sh
