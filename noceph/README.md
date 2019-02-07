@@ -64,17 +64,6 @@ Now, the Kubernetes cluster are ready to deploy containers.
 
 ## Installation
 
-
-After completing all steps of the previous section, to deploy the `tma_deployment.yaml` file, you first need to execute the commands presented in this [README](https://github.com/eubr-atmosphere/tma-framework-k/tree/master/development/ceph).
-With Ceph correctly configured, need to execute the following commands in Ceph machine:
-
-```sh
-ceph auth get-key client.admin
-echo [Output of the previous command]| base64
-```
-
-After that you need to replace in yaml file in line 393 the key with the one returned by the previous command. Finally, you need to replace the line 449 of the yaml file with the IP or FQDN of Ceph machine.
-
 To deploy TMA_Analyze component, you need to initialize kube-proxy service. To do that, you need to execute the following command:
 
 ```sh
