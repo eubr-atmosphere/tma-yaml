@@ -452,7 +452,7 @@ spec:
             monitors:
               - 192.168.122.37:6789
             pool: rbd
-            image: test
+            image: tma_k_db_mysql
             user: admin
             secretRef:
               name: ceph-secret
