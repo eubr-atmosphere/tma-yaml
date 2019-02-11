@@ -179,6 +179,17 @@ configure tmadeployment (
 @end
 )
 
+configure kubeproxy (
+@begin
+---
+ - tasks:
+    - name: initialize kube-proxy service for TMA_Analyze
+      ssh: kubectl proxy --address kubeserverpublic.localdomain --port=8089  --accept-hosts '.*' &
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+@end
+)
+
 configure kubeapply (
 @begin
 ---
@@ -202,5 +213,6 @@ contextualize 100000 (
   system wn configure installceph step 4
   system ceph configure cephkey step 5
   system front configure tmadeployment step 6
-  system front configure kubeapply step 7
+  system front configure kubeproxy step 7
+  system front configure kubeapply step 8
 )
