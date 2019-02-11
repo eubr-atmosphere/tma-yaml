@@ -184,7 +184,7 @@ configure kubeproxy (
 ---
  - tasks:
     - name: initialize kube-proxy service for TMA_Analyze
-      ssh: kubectl proxy --address kubeserverpublic.localdomain --port=8089  --accept-hosts '.*' &
+      shell: kubectl proxy --address kubeserverpublic.localdomain --port=8089  --accept-hosts '.*' &
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
 @end
