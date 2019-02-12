@@ -126,10 +126,6 @@ configure cephnode (
     - name: Execute ceph installation script
       command: sh ceph_installation.sh chdir=/tmp/tma/development/ceph/
 
-    - name: Check kernel version and disable ceph feature if needed
-      command: rbd feature disable tma_k_db_mysql exclusive-lock
-      when: KERNEL_RELEASE.stdout | version_compare('4.12.0', '<=')
-
     - lineinfile:
         path: /tmp/tma/development/ceph/ceph_configuration.sh
         regexp: 'mkfs.ext4 /dev/rbd0'
@@ -138,6 +134,10 @@ configure cephnode (
 
     - name: Execute ceph configuration script
       shell: sh ceph_configuration.sh >> /tmp/key.txt chdir=/tmp/tma/development/ceph/ creates=/tmp/key.txt
+   
+    - name: Check kernel version and disable ceph feature if needed
+      command: rbd feature disable tma_k_db_mysql exclusive-lock
+      when: KERNEL_RELEASE.stdout | version_compare('4.12.0', '<=')
 @end
 )
 
