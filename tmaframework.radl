@@ -10,6 +10,7 @@ net_interface.0.dns_name = 'kubeserver' and
 net_interface.1.connection = 'public' and
 net_interface.1.dns_name = 'kubeserverpublic' and
 disk.0.os.name='linux' and
+disk.0.image.url = 'fbw://fogbow-ubuntu' and
 disk.0.applications contains (name='ansible.modules.grycap.kubernetes')
 )
 
@@ -19,7 +20,8 @@ cpu.count>=4 and
 memory.size>=4g and
 net_interface.0.connection = 'private' and
 net_interface.0.dns_name = 'wn-#N#' and
-disk.0.os.name='linux'
+disk.0.os.name='linux' and
+disk.0.image.url = 'fbw://fogbow-ubuntu'
 )
 
 system ceph (
@@ -28,9 +30,10 @@ cpu.count>=2 and
 memory.size>=4g and
 net_interface.0.connection = 'private' and
 net_interface.0.dns_name = 'cephserver' and
-net_interface.1.connection = 'public' and
-net_interface.1.dns_name = 'cephserverpublic' and
-disk.0.os.name='linux'
+#net_interface.1.connection = 'public' and
+#net_interface.1.dns_name = 'cephserverpublic' and
+disk.0.os.name='linux' and
+disk.0.image.url = 'fbw://fogbow-ubuntu'
 )
 
 
@@ -83,35 +86,26 @@ configure installceph (
 @end
 )
 
-
-configure cephnode (
+configure installcephnode (
 @begin
 ---
  - tasks:
-    - name: Get Kernel release
-      command: uname -r
-      register: KERNEL_RELEASE
-      changed_when: false
-
     - name: Install git package
       package: name=git
 
     - name: Git clone tma-framework-k repo for ceph scripts
-      git: repo='https://github.com/eubr-atmosphere/tma-framework-k.git' dest=/tmp/tma version=master
+      git: repo='https://github.com/eubr-atmosphere/tma-framework-k.git' dest=/tmp/tma version=master force=yes
 
     - name: Changing perm of "ceph_installation.sh", adding "+x"
       file: path=/tmp/tma/development/ceph/ceph_installation.sh mode=0777
 
-    - name: Changing perm of "ceph_configuration.sh", adding "+x"
-      file: path=/tmp/tma/development/ceph/ceph_configuration.sh mode=0777
-
-    - name: Get Kernel release
-      shell: ip -o -f inet addr show 'ens4' | awk '/scope global/ {print $4}'
+    - name: Get netmask
+      shell: ip -o -f inet addr show 'ens3' | awk '/scope global/ {print $4}'
       register: NETWORK
       changed_when: false
 
     - name: Modify "ceph_installation.sh" to have the ceph IP
-      lineinfile: 
+      lineinfile:
         path: /tmp/tma/development/ceph/ceph_installation.sh
         regexp: '192.168.1.1'
         line: " -e MON_IP={{ hostvars[groups['ceph'][0]]['IM_NODE_PRIVATE_IP'] }} -e CEPH_PUBLIC_NETWORK={{NETWORK.stdout }} docker.avvo.com/ceph-demo:luminous"
@@ -125,16 +119,37 @@ configure cephnode (
 
     - name: Execute ceph installation script
       command: sh ceph_installation.sh chdir=/tmp/tma/development/ceph/
+@end
+)
 
-    - lineinfile:
-        path: /tmp/tma/development/ceph/ceph_configuration.sh
-        regexp: 'mkfs.ext4 /dev/rbd0'
-        line: '#mkfs.ext4 /dev/rbd0'
-        state: present
+
+configure confcephnode (
+@begin
+---
+ - tasks:
+    - name: enable ceph rbd
+      command: ceph osd pool application enable rbd rbd
+
+    - name: ceph crush tunables
+      command: ceph osd crush tunables hammer
+
+    - name: Get Kernel release
+      command: uname -r
+      register: KERNEL_RELEASE
+      changed_when: false
+
+    - name: Changing perm of "ceph_configuration.sh", adding "+x"
+      file: path=/tmp/tma/development/ceph/ceph_configuration.sh mode=0777
+
+#    - lineinfile:
+#        path: /tmp/tma/development/ceph/ceph_configuration.sh
+#        regexp: 'mkfs.ext4 /dev/rbd0'
+#        line: '#mkfs.ext4 /dev/rbd0'
+#        state: present
 
     - name: Execute ceph configuration script
       shell: sh ceph_configuration.sh >> /tmp/key.txt chdir=/tmp/tma/development/ceph/ creates=/tmp/key.txt
-   
+
     - name: Check kernel version and disable ceph feature if needed
       command: rbd feature disable tma_k_db_mysql exclusive-lock
       when: KERNEL_RELEASE.stdout | version_compare('4.12.0', '<=')
@@ -159,14 +174,14 @@ configure tmadeployment (
  - tasks:
     - name: Download git repo of the TMA YAML
       git:
-        repo: https://github.com/amcaar/tma-yaml
+        repo: https://github.com/eubr-atmosphere/tma-yaml
         dest: /tmp/tma-yaml
-        version: master
+        version: update/tma-deployment
 
     - name: Modify ceph key in TMA YAML
       lineinfile:
         path: /tmp/tma-yaml/integrated/tma_deployment.yaml
-        regexp: 'QVFEWVplbGJlWHhWSUJBQWFzV1B1YUNob0p6OURRMTBSaXA5d3c9PQo='
+        regexp: 'QVFDam5STmNQUXJwSnhBQStJWUxmMldUYjVuK0xXWHVGYzRkaEE9PQo='
         line: "  key: {{ lookup('file', '/tmp/key.txt') }}"
         state: present
 
@@ -176,6 +191,17 @@ configure tmadeployment (
         regexp: '192.168.122.37'
         line: "              - {{ hostvars[groups['ceph'][0]]['IM_NODE_PRIVATE_IP'] }}:6789"
         state: present
+@end
+)
+
+configure kubeproxy (
+@begin
+---
+ - tasks:
+    - name: initialize kube-proxy service for TMA_Analyze
+      shell: kubectl proxy --address kubeserverpublic.localdomain --port=8089  --accept-hosts '.*' &
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
 @end
 )
 
@@ -190,6 +216,20 @@ configure kubeapply (
 @end
 )
 
+configure clean (
+@begin
+---
+ - tasks:
+    - name: wait for the pods to be running
+      wait_for:
+        path: /var/lib/kubelet/plugins/kubernetes.io/rbd/mounts/rbd-image-tma_k_db_mysql/lost+found/
+
+    - name: delete residual files in rbd image
+      command: rm -rf /var/lib/kubelet/plugins/kubernetes.io/rbd/mounts/rbd-image-tma_k_db_mysql/lost+found/
+@end
+)
+
+
 deploy front 1
 deploy wn 1
 deploy ceph 1
@@ -197,10 +237,13 @@ deploy ceph 1
 contextualize 100000 (
   system front configure kubefront step 1
   system front configure installceph step 2
-  system ceph configure cephnode step 3
+  system ceph configure installcephnode step 3
   system wn configure kubewn step 3
   system wn configure installceph step 4
-  system ceph configure cephkey step 5
-  system front configure tmadeployment step 6
-  system front configure kubeapply step 7
+  system ceph configure confcephnode step 5
+  system ceph configure cephkey step 6
+  system front configure tmadeployment step 7
+  system front configure kubeproxy step 8
+  system front configure kubeapply step 9
+  system wn configure clean step 10
 )
