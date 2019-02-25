@@ -245,5 +245,5 @@ contextualize 100000 (
   system front configure tmadeployment step 7
   system front configure kubeproxy step 8
   system front configure kubeapply step 9
-  system wn configure clean step 10
+  #system wn configure clean step 10
 )
