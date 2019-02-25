@@ -395,7 +395,7 @@ kind: Secret
 metadata:
   name: ceph-secret
 data:
-  key: QVFDam5STmNQUXJwSnhBQStJWUxmMldUYjVuK0xXWHVGYzRkaEE9PQo=
+  key: QVFENzZITmNQUTJ5Q1JBQVU4OUJTdEEzaFdYMnl1cU1DNGlKSkE9PQo=
 ---
 apiVersion: v1
 kind: Secret
@@ -446,6 +446,7 @@ spec:
         volumeMounts:
         - name: mysql-vol
           mountPath: /var/lib/mysql
+          subPath: mysql
       volumes:
         - name: mysql-vol
           rbd:
