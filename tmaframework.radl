@@ -181,7 +181,7 @@ configure tmadeployment (
     - name: Modify ceph key in TMA YAML
       lineinfile:
         path: /tmp/tma-yaml/integrated/tma_deployment.yaml
-        regexp: 'QVFDam5STmNQUXJwSnhBQStJWUxmMldUYjVuK0xXWHVGYzRkaEE9PQo='
+        regexp: 'QVFENzZITmNQUTJ5Q1JBQVU4OUJTdEEzaFdYMnl1cU1DNGlKSkE9PQo='
         line: "  key: {{ lookup('file', '/tmp/key.txt') }}"
         state: present
 
