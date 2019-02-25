@@ -58,7 +58,7 @@ configure tmadeployment (
       git:
         repo: https://github.com/eubr-atmosphere/tma-yaml
         dest: /tmp/tma-yaml
-        version: update/tma-deployment
+        version: master
 
     - name: initialize kube-proxy service for TMA_Analyze
       shell: kubectl proxy --address kubeserverpublic.localdomain --port=8089  --accept-hosts '.*' &
