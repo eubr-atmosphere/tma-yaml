@@ -176,7 +176,7 @@ configure tmadeployment (
       git:
         repo: https://github.com/eubr-atmosphere/tma-yaml
         dest: /tmp/tma-yaml
-        version: update/tma-deployment
+        version: master
 
     - name: Modify ceph key in TMA YAML
       lineinfile:
