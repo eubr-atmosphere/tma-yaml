@@ -33,3 +33,20 @@ Also,if you want to use another image, modify this line of the RADL recipes, by 
 ```
 disk.0.image.url = 'fbw://fogbow-ubuntu' and
 ```
+
+# TMA EC3 recipes
+In order to deploy an elastic Kubernetes cluster with the TMA, you have to use the recipes contained in file 'ec3-recipes'.
+ 
+For that, download the EC3 client from here (https://github.com/grycap/ec3), configure properly the credentials to access Fogbow and deploy your cluster with the following command:
+ 
+```
+$ ./ec3 launch TMACLUSTER kubernetes-tma tmaframework ubuntu16 -a auth.dat
+```
+To access the cluster once it is ready, use the following command:
+```
+$ ./ec3 ssh TMACLUSTER
+```
+Finally, to delete the cluster, use this command:
+```
+$ ./ec3 destroy TMACLUSTER
+```
