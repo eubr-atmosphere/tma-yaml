@@ -1,0 +1,22 @@
+## Ubuntu 16.04
+
+system front (
+    cpu.arch='x86_64' and
+    cpu.count>=2 and
+    memory.size>=8192m and
+    disk.0.os.name = 'linux' and
+    disk.0.image.url = 'fbw://fns-atm-prod-cloud.lsd.ufcg.edu.br/a09e8cd9-3b82-4adf-8ac7-b9cceedcacaa' and
+    ec3aas.username = 'atmosphere'
+)
+
+system wn (
+    ec3_max_instances = 10 and
+    ec3_node_type = 'wn' and
+    #ec3_reuse_nodes = 'true' and
+    #ec3_min_instances = 2 and
+    cpu.arch='x86_64' and
+    cpu.count>=4 and
+    memory.size>=4096m and
+    disk.0.os.name = 'linux' and
+    disk.0.image.url = 'fbw://fns-atm-prod-cloud.lsd.ufcg.edu.br/a09e8cd9-3b82-4adf-8ac7-b9cceedcacaa'
+)
