@@ -67,7 +67,7 @@ configure tmadeployment (
         KUBECONFIG: /etc/kubernetes/admin.conf
 
     - name: apply TMA YAML
-      command: kubectl apply -f /tmp/tma-yaml/noceph/tma_deployment.yaml chdir="/tmp/tma-yaml/noceph"
+      command: kubectl apply -f /tmp/tma-yaml/noceph/tma_deployment_without_ceph.yaml chdir="/tmp/tma-yaml/noceph"
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
 
