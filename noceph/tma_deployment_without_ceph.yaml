@@ -72,6 +72,8 @@ spec:
       labels:
         app: zk
     spec:
+      nodeSelector:
+         region: europe
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -190,6 +192,8 @@ spec:
       labels:
         app: kafka
     spec:
+      nodeSelector:
+         region: europe
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -360,6 +364,8 @@ spec:
       labels:
         run: tma-dataloader
     spec:
+      nodeSelector:
+         region: europe
       containers:
       - name: tma-dataloader
         image: eubraatmosphere/dataloader
@@ -412,6 +418,8 @@ spec:
       labels:
         app: mysql
     spec:
+      nodeSelector:
+         region: europe
       terminationGracePeriodSeconds: 10
       containers:
       - name: mysql
@@ -470,6 +478,8 @@ spec:
       labels:
         app: monitor-server # has to match .spec.selector.matchLabels
     spec:
+      nodeSelector:
+         region: europe
       containers:
       - name: monitor-server
         image: tma-monitor/server-python:0.1
@@ -494,6 +504,8 @@ spec:
       labels:
         run: tma-analyze
     spec:
+      nodeSelector:
+         region: europe
       containers:
       - name: tma-analyze
         image: eubraatmosphere/tma-analyze
@@ -513,6 +525,8 @@ spec:
       labels:
         run: tma-planning
     spec:
+      nodeSelector:
+         region: europe
       containers:
       - name: tma-planning
         image: eubraatmosphere/tma-planning
@@ -532,6 +546,8 @@ spec:
       labels:
         run: tma-execute
     spec:
+      nodeSelector:
+         region: europe
       containers:
       - name: tma-execute
         image: eubraatmosphere/tma-execute
