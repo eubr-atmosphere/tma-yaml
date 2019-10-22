@@ -345,57 +345,31 @@ spec:
         requests:
           storage: 10Gi
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: flume
-  labels:
-    app: flume
-spec:
-  ports:
-  - port: 9100
-    name: metrics
-  clusterIP: None
-  selector:
-    app: flume
----
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
+
 metadata:
-  name: flume
+  name: tma-dataloader
+
 spec:
   selector:
     matchLabels:
-      app: flume
-  serviceName: "flume"
+      run: tma-dataloader
   template:
     metadata:
       labels:
-        app: flume
+        run: tma-dataloader
     spec:
-      terminationGracePeriodSeconds: 10
       containers:
-      - name: flume
-        image: eubraatmosphere/tma-flume
-        tty: true
-        volumeMounts:
-        - name: testing-mode
-          mountPath: /testingmode
-        ports:
-        - containerPort: 9100
-          name: metrics
-        command: ["/bin/bash","-c", " sleep 120 && cd /flume/apache-flume-1.6.0-bin/bin && ./flume-ng agent --conf /flume/apache-flume-1.6.0-bin/conf/ -f /flume/apache-flume-1.6.0-bin/conf/flume.conf -n agent -Dflume.root.logger=INFO,console"]
-      volumes:
-        - name: testing-mode
-          hostPath:
-            path: /home/kubernetes/Desktop/testingmode
+      - name: tma-dataloader
+        image: eubraatmosphere/dataloader
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: ceph-secret
 data:
-  key: QVFENzZITmNQUTJ5Q1JBQVU4OUJTdEEzaFdYMnl1cU1DNGlKSkE9PQo=
+  key: QVFDRmVSdGN3VEJOR1JBQWlRNFEvVVJZSG5VMVNKZlFHb1ZwTkE9PQo=
 ---
 apiVersion: v1
 kind: Secret
@@ -451,7 +425,7 @@ spec:
         - name: mysql-vol
           rbd:
             monitors:
-              - 192.168.122.37:6789
+              - 192.168.122.44:6789
             pool: rbd
             image: tma_k_db_mysql
             user: admin
